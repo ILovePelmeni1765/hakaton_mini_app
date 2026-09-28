@@ -1,0 +1,138 @@
+.address-picker {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.address-picker label {
+  font-size: 14px;
+  font-weight: 650;
+}
+.address-search {
+  display: flex;
+  gap: 10px;
+}
+.address-search input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+.address-help {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.address-message {
+  margin: 0;
+  font-size: 14px;
+}
+.address-results {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  overflow: hidden;
+}
+.address-results li + li {
+  border-top: 1px solid var(--line);
+}
+.address-results button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  text-align: left;
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+}
+.address-results button:hover {
+  background: var(--violet-soft);
+}
+.address-results svg {
+  flex-shrink: 0;
+}
+.address-results span {
+  overflow-wrap: anywhere;
+}
+.address-selected {
+  display: grid;
+  gap: 8px;
+}
+.address-selected input {
+  width: 100%;
+  min-width: 0;
+}
+.address-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+}
+.address-sources legend {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.address-sources button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--text);
+  background: var(--surface);
+}
+.address-sources button[aria-pressed='true'] {
+  color: var(--violet-deep);
+  background: var(--violet-soft);
+  border-color: var(--violet);
+}
+.address-home {
+  display: grid;
+  gap: 12px;
+}
+.address-home a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--violet-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.address-home p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.account-home-address {
+  max-width: 760px;
+  margin-top: 24px;
+}
+.account-home-address .account-form-actions {
+  margin-top: 20px;
+}
+.account-home-address > p {
+  overflow-wrap: anywhere;
+}
+.home-address-fields {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+@media (max-width: 480px) {
+  .address-sources {
+    flex-direction: column;
+  }
+  .address-sources button {
+    justify-content: flex-start;
+    width: 100%;
+  }
+}

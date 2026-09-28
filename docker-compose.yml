@@ -1,0 +1,57 @@
+name: city-pulse
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pulse
+      POSTGRES_PASSWORD: pulse
+      POSTGRES_DB: city_pulse
+    ports:
+      - "${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - pulse_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulse -d city_pulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://pulse:pulse@postgres:5432/city_pulse?schema=public
+      JWT_SECRET: docker-development-secret-change-in-production
+      WEB_ORIGIN: http://localhost:4173,http://127.0.0.1:4173,http://localhost:5173,http://127.0.0.1:5173
+      PORT: 3000
+      UPLOAD_DIR: /app/apps/server/uploads
+      DEMO_AUTH_ENABLED: "true"
+      DGIS_API_KEY: ${DGIS_API_KEY:-}
+    ports:
+      - "3000:3000"
+    volumes:
+      - pulse_uploads:/app/apps/server/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "pnpm --filter @pulse/server prisma:deploy && pnpm --filter @pulse/server prisma:seed && node apps/server/dist/main.js"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3000/api
+        VITE_SOCKET_URL: http://localhost:3000
+        VITE_DGIS_MAPS_API_KEY: ${VITE_DGIS_MAPS_API_KEY:-}
+    ports:
+      - "4173:80"
+    depends_on:
+      - server
+
+volumes:
+  pulse_postgres:
+  pulse_uploads:

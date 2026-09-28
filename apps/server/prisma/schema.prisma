@@ -1,0 +1,442 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  RESIDENT
+  OPERATOR
+  CONTRACTOR
+  ADMIN
+}
+
+enum ProblemStatus {
+  DRAFT
+  AWAITING_COMMUNITY_CONFIRMATION
+  COMMUNITY_CONFIRMED
+  OPERATOR_REVIEW
+  NEEDS_MORE_INFO
+  ASSIGNED
+  IN_PROGRESS
+  RESOLUTION_SUBMITTED
+  OPERATOR_VERIFICATION
+  COMMUNITY_VERIFICATION
+  RESOLVED
+  PARTIALLY_RESOLVED
+  DISPUTED
+  REOPENED
+  REJECTED
+  DUPLICATE
+}
+
+enum ProblemPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum ProblemCategory {
+  LIGHTING
+  OPEN_MANHOLE
+  ROAD
+  SIDEWALK
+  WASTE
+  PLAYGROUND
+  ACCESSIBILITY
+  PUBLIC_TRANSPORT
+  SNOW
+  WATER_LEAK
+  ROAD_SIGN
+  FALLEN_TREE
+  OTHER
+}
+
+enum ConfirmationType {
+  EXISTS
+  NOT_FOUND
+  CHANGED
+  EVIDENCE
+}
+
+enum CommentType {
+  RESIDENT
+  CLARIFICATION
+  OFFICIAL
+  CONTRACTOR
+  SYSTEM
+  INFO_REQUEST
+}
+
+enum ResolutionVoteType {
+  FULLY_RESOLVED
+  PARTIALLY_RESOLVED
+  STILL_PRESENT
+  WORSE
+  CANNOT_VERIFY
+}
+
+enum AssignmentStatus {
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  RETURNED
+  COMPLETED
+}
+
+enum NotificationType {
+  CONFIRMATION
+  OPERATOR_ACCEPTED
+  ASSIGNED
+  DEADLINE_CHANGED
+  WORK_STARTED
+  REPORT_SUBMITTED
+  COMMUNITY_VERIFICATION
+  DISPUTED
+  RESOLVED
+  MISSION_NEARBY
+  COMMENT
+}
+
+enum MediaKind {
+  BEFORE
+  AFTER
+  EVIDENCE
+  COMMENT
+}
+
+enum MissionStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+model City {
+  id String @id @default(cuid())
+  name String @unique
+  districts District[]
+  organizations Organization[]
+  missions Mission[]
+  createdAt DateTime @default(now())
+}
+
+model District {
+  id String @id @default(cuid())
+  cityId String
+  city City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  name String
+  slug String @unique
+  centerLat Float
+  centerLng Float
+  cleanliness Int @default(70)
+  safety Int @default(70)
+  lighting Int @default(70)
+  accessibility Int @default(70)
+  roads Int @default(70)
+  improvement Int @default(70)
+  users User[]
+  problems Problem[]
+  missions Mission[]
+  @@index([cityId])
+}
+
+model Organization {
+  id String @id @default(cuid())
+  cityId String
+  city City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  name String
+  verified Boolean @default(false)
+  users User[]
+  assignments Assignment[]
+  reports ResolutionReport[]
+  @@unique([cityId, name])
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  passwordHash String
+  displayName String
+  avatarUrl String?
+  homeAddress Json?
+  telegramId String? @unique
+  role UserRole @default(RESIDENT)
+  districtId String?
+  district District? @relation(fields: [districtId], references: [id])
+  organizationId String?
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  reputation Int @default(0)
+  trustLevel Int @default(1)
+  usefulStreak Int @default(0)
+  notificationSettings Json @default("{}")
+  isActive Boolean @default(true)
+  createdProblems Problem[] @relation("ProblemAuthor")
+  confirmations ProblemConfirmation[]
+  subscriptions ProblemSubscription[]
+  comments Comment[]
+  assignments Assignment[] @relation("AssignmentEmployee")
+  resolutionReports ResolutionReport[]
+  resolutionVotes ResolutionVote[]
+  notifications Notification[]
+  missionParticipations MissionParticipation[]
+  achievements UserAchievement[]
+  reputationEvents ReputationEvent[]
+  statusChanges StatusHistory[]
+  auditLogs AuditLog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([role])
+  @@index([districtId])
+}
+
+model Problem {
+  id String @id @default(cuid())
+  number Int @unique @default(autoincrement())
+  title String
+  description String
+  category ProblemCategory
+  status ProblemStatus @default(DRAFT)
+  priority ProblemPriority @default(NORMAL)
+  latitude Float
+  longitude Float
+  address String
+  authorId String
+  author User @relation("ProblemAuthor", fields: [authorId], references: [id])
+  districtId String
+  district District @relation(fields: [districtId], references: [id])
+  duplicateOfId String?
+  duplicateOf Problem? @relation("Duplicates", fields: [duplicateOfId], references: [id])
+  duplicates Problem[] @relation("Duplicates")
+  dueAt DateTime?
+  resolvedAt DateTime?
+  officialResponse String?
+  rejectionReason String?
+  confirmations ProblemConfirmation[]
+  subscriptions ProblemSubscription[]
+  media ProblemMedia[]
+  comments Comment[]
+  assignments Assignment[]
+  reports ResolutionReport[]
+  votes ResolutionVote[]
+  history StatusHistory[]
+  notifications Notification[]
+  auditLogs AuditLog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([status, priority])
+  @@index([category, status])
+  @@index([districtId, createdAt])
+  @@index([latitude, longitude])
+}
+
+model ProblemMedia {
+  id String @id @default(cuid())
+  uploadedById String?
+  problemId String?
+  problem Problem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reportId String?
+  report ResolutionReport? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  url String
+  mimeType String
+  size Int
+  kind MediaKind @default(BEFORE)
+  alt String
+  createdAt DateTime @default(now())
+  @@index([problemId])
+}
+
+model ProblemConfirmation {
+  id String @id @default(cuid())
+  problemId String
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type ConfirmationType
+  hasPhoto Boolean @default(false)
+  trustWeight Float @default(1)
+  createdAt DateTime @default(now())
+  @@unique([problemId, userId])
+  @@index([userId, createdAt])
+}
+
+model ProblemSubscription {
+  id String @id @default(cuid())
+  problemId String
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@unique([problemId, userId])
+}
+
+model Comment {
+  id String @id @default(cuid())
+  problemId String
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
+  parentId String?
+  parent Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+  type CommentType @default(RESIDENT)
+  body String
+  isPinned Boolean @default(false)
+  isDeleted Boolean @default(false)
+  isModerated Boolean @default(false)
+  reportCount Int @default(0)
+  media ProblemMedia[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([problemId, createdAt])
+}
+
+model Assignment {
+  id String @id @default(cuid())
+  problemId String
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization Organization @relation(fields: [organizationId], references: [id])
+  employeeId String?
+  employee User? @relation("AssignmentEmployee", fields: [employeeId], references: [id])
+  status AssignmentStatus @default(ASSIGNED)
+  plannedAt DateTime?
+  note String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([organizationId, status])
+}
+
+model ResolutionReport {
+  id String @id @default(cuid())
+  problemId String
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
+  organizationId String
+  organization Organization @relation(fields: [organizationId], references: [id])
+  summary String
+  technicalConclusion String?
+  media ProblemMedia[]
+  createdAt DateTime @default(now())
+}
+
+model ResolutionVote {
+  id String @id @default(cuid())
+  problemId String
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vote ResolutionVoteType
+  comment String?
+  photoUrl String?
+  createdAt DateTime @default(now())
+  @@unique([problemId, userId])
+}
+
+model StatusHistory {
+  id String @id @default(cuid())
+  problemId String
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  fromStatus ProblemStatus?
+  toStatus ProblemStatus
+  actorId String
+  actor User @relation(fields: [actorId], references: [id])
+  reason String?
+  createdAt DateTime @default(now())
+  @@index([problemId, createdAt])
+}
+
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemId String?
+  problem Problem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  type NotificationType
+  title String
+  body String
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, readAt, createdAt])
+}
+
+model Mission {
+  id String @id @default(cuid())
+  cityId String
+  city City @relation(fields: [cityId], references: [id])
+  districtId String?
+  district District? @relation(fields: [districtId], references: [id])
+  title String
+  description String
+  icon String @default("target")
+  target Int
+  reward Int
+  startsAt DateTime
+  endsAt DateTime
+  status MissionStatus @default(ACTIVE)
+  participations MissionParticipation[]
+  createdAt DateTime @default(now())
+}
+
+model MissionParticipation {
+  id String @id @default(cuid())
+  missionId String
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  progress Int @default(0)
+  completedAt DateTime?
+  @@unique([missionId, userId])
+}
+
+model Achievement {
+  id String @id @default(cuid())
+  code String @unique
+  title String
+  description String
+  icon String
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  earnedAt DateTime @default(now())
+  @@unique([userId, achievementId])
+}
+
+model ReputationEvent {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points Int
+  reason String
+  problemId String?
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+  actorId String
+  actor User @relation(fields: [actorId], references: [id])
+  problemId String?
+  problem Problem? @relation(fields: [problemId], references: [id])
+  action String
+  entityType String
+  entityId String
+  metadata Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId])
+}

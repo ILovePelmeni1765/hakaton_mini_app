@@ -1,0 +1,13 @@
+**/node_modules
+.pnpm-store
+**/dist
+**/.turbo
+**/coverage
+**/test-results
+**/playwright-report
+**/*.log
+.git
+**/.env
+**/.env.*
+!**/.env.example
+apps/server/uploads
