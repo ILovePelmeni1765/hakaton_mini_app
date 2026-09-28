@@ -10,7 +10,12 @@ export async function api<T>(path: string, options: RequestInit & { json?: unkno
   let response: Response;
   try { response = await fetch(`${API_URL}${path}`, {
     ...options,
-    headers: { ...(options.json ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers },
+    headers: {
+  'ngrok-skip-browser-warning': 'true',
+  ...(options.json ? { 'Content-Type': 'application/json' } : {}),
+  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  ...options.headers,
+},
     body: options.json ? JSON.stringify(options.json) : options.body,
   }); } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') throw error;
