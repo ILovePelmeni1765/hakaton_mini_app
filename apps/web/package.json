@@ -12,6 +12,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@2gis/mapgl": "^1.78.1",
     "@2gis/mapgl-clusterer": "2.5.2",
     "@hookform/resolvers": "5.2.1",
     "@pulse/platform": "workspace:*",
