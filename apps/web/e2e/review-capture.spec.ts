@@ -6,7 +6,7 @@ test('capture resident workbench for finish review', async ({ page }, testInfo) 
   test.setTimeout(150_000);
   const mobile = testInfo.project.name.startsWith('mobile');
   const device = mobile ? 'mobile' : 'desktop';
-  const reviewDirectory = path.resolve('.impeccable/review');
+  const reviewDirectory = testInfo.outputPath('review');
   const coverageDirectory = path.join(reviewDirectory, 'coverage');
   mkdirSync(coverageDirectory, { recursive: true });
   await page.goto('/login', { waitUntil: 'domcontentloaded' });

@@ -999,8 +999,7 @@ p { line-height: 1.5; }
   .resident-workbench--map .resident-register, .resident-workbench--list .resident-map { display: none; }
   .register-search { grid-template-columns: minmax(0, 1fr) 42px 42px; }
   .register-row { min-height: 100px; }
-  .map-create { display: inline-flex; right: 8px; bottom: 8px; }
-  .resident-workbench .map-create { bottom: calc(72px + var(--safe-bottom)); }
+  .map-create { display: none; }
   .problem-sheet + .map-create { display: none; }
   .home-followup { padding-top: 12px; padding-bottom: calc(82px + var(--safe-bottom)); grid-template-columns: 1fr; }
   .district-ledger, .mission-ledger { min-height: 0; border-right: 0; border-bottom: 0; }
@@ -1425,7 +1424,7 @@ select:focus {
 .page-header h1 { margin-bottom: 10px; }
 .page-header p { font-size: 15px; }
 
-/* Login — modular storefront plus living map */
+/* Login */
 .login-page {
   height: 100svh;
   min-height: 100svh;
@@ -1490,7 +1489,7 @@ select:focus {
 .login-mosaic {
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(320px, 1.05fr) minmax(300px, .95fr);
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) clamp(118px, 16svh, 150px);
   gap: 14px;
   animation: mosaic-reveal 650ms var(--ease-out) both;
@@ -1518,7 +1517,7 @@ select:focus {
 }
 
 .login-tile--signal h1 {
-  max-width: 9.5ch;
+  max-width: 16ch;
   margin-bottom: 16px;
   font-size: clamp(42px, 4.4vw, 68px);
   line-height: .96;
@@ -1549,92 +1548,6 @@ select:focus {
 
 .login-signal__action:active { transform: scale(.975); }
 @media (hover: hover) and (pointer: fine) { .login-signal__action:hover { background: var(--violet-deep); box-shadow: 0 10px 24px rgb(101 71 245 / .22); transform: translateY(-1px); } }
-
-.login-tile--map { padding: 18px; background: var(--coral); }
-
-.city-scene {
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  border-radius: 18px;
-  position: relative;
-  background: var(--cream);
-}
-
-.city-scene__river {
-  width: 36%;
-  height: 140%;
-  position: absolute;
-  left: 35%;
-  top: -20%;
-  border-radius: 50%;
-  background: var(--cyan);
-  transform: rotate(18deg);
-}
-
-.city-scene__road {
-  height: 34px;
-  position: absolute;
-  z-index: 2;
-  border: 8px solid var(--surface);
-  border-radius: 999px;
-  background: #ddd6f6;
-  transform-origin: left center;
-}
-
-.city-scene__road--one { width: 120%; left: -8%; top: 30%; transform: rotate(-17deg); }
-.city-scene__road--two { width: 112%; left: 8%; top: 75%; transform: rotate(24deg); }
-
-.city-scene__park {
-  width: 27%;
-  height: 20%;
-  position: absolute;
-  left: 8%;
-  bottom: 10%;
-  border-radius: 18px 44px 18px 28px;
-  background: var(--lime);
-  transform: rotate(-8deg);
-}
-
-.city-scene__block {
-  position: absolute;
-  border-radius: 12px;
-  background: #d9d1f4;
-}
-
-.city-scene__block--one { width: 24%; height: 18%; left: 8%; top: 9%; transform: rotate(-8deg); }
-.city-scene__block--two { width: 22%; height: 23%; right: 7%; top: 14%; transform: rotate(8deg); }
-.city-scene__block--three { width: 25%; height: 17%; right: 12%; bottom: 12%; transform: rotate(-5deg); }
-
-.city-scene__pin,
-.city-scene__route {
-  position: absolute;
-  z-index: 4;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 10px 24px rgb(42 31 91 / .18);
-}
-
-.city-scene__pin { width: 64px; height: 64px; left: 48%; top: 38%; border-radius: 21px; color: #fff; background: var(--violet); transform: rotate(-7deg); }
-.city-scene__route { width: 52px; height: 52px; right: 10%; bottom: 22%; border-radius: 18px; color: var(--text); background: var(--lime); transform: rotate(7deg); }
-
-.login-map-caption {
-  position: absolute;
-  left: 38px;
-  right: 38px;
-  bottom: 36px;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  pointer-events: none;
-}
-
-.login-map-caption span,
-.login-map-caption strong { padding: 8px 11px; border-radius: 10px; background: var(--surface); }
-.login-map-caption span { color: var(--muted); font-size: 11px; }
-.login-map-caption strong { font-size: 12px; }
 
 .login-tile--flow {
   grid-column: 1 / -1;
@@ -1895,7 +1808,6 @@ select:focus {
 /* Responsive translation keeps the topology instead of shrinking it. */
 @media (max-width: 1260px) {
   .login-trust span:nth-child(2) { display: none; }
-  .login-mosaic { grid-template-columns: minmax(300px, 1fr) minmax(260px, .82fr); }
   .login-tile--signal { padding: 34px; }
   .login-tile--signal h1 { font-size: clamp(44px, 5vw, 64px); }
 }
@@ -1905,7 +1817,6 @@ select:focus {
   .app-main { margin-left: 232px; }
   .login-page { grid-template-columns: minmax(0, 1fr) 370px; }
   .login-trust { display: none; }
-  .login-mosaic { grid-template-columns: minmax(280px, 1fr) minmax(220px, .82fr); }
 }
 
 @media (max-width: 960px) {
@@ -1921,7 +1832,7 @@ select:focus {
   .login-showcase { display: contents; }
   .login-brandbar { order: 0; }
   .login-panel { min-height: auto; order: 1; }
-  .login-mosaic { min-height: 950px; order: 2; grid-template-columns: 1fr; grid-template-rows: minmax(390px, 1fr) 300px 230px; }
+  .login-mosaic { order: 2; grid-template-rows: minmax(390px, 1fr) 230px; }
   .login-tile--signal { grid-column: 1; }
   .login-tile--flow { grid-column: 1; }
   .login-card { padding-block: 22px; }
@@ -1938,8 +1849,6 @@ select:focus {
   .login-tile--signal h1 { margin-bottom: 10px; font-size: clamp(40px, 4vw, 56px); }
   .login-tile--signal p { margin-bottom: 12px; font-size: 14px; line-height: 1.4; }
   .login-signal__action { min-height: 44px; }
-  .login-tile--map { padding: 14px; }
-  .login-map-caption { left: 26px; right: 26px; bottom: 24px; }
   .login-tile--flow { padding: 10px 14px; }
   .login-tile--flow > div { padding-inline: 12px; grid-template-columns: 42px minmax(0, 1fr); gap: 9px; }
   .flow-icon { width: 42px; height: 42px; border-radius: 13px; }
@@ -1982,14 +1891,11 @@ select:focus {
   .login-card__heading { margin-bottom: 22px; }
   .login-card__heading h2 { font-size: 32px; }
   .login-card .demo-grid { grid-template-columns: 1fr; }
-  .login-mosaic { min-height: 960px; grid-template-rows: minmax(400px, 1fr) 260px 280px; gap: 8px; }
+  .login-mosaic { grid-template-rows: minmax(400px, 1fr) 280px; gap: 8px; }
   .login-tile { border-radius: 20px; }
   .login-tile--signal { padding: 26px 22px; }
   .login-tile--signal h1 { max-width: 10ch; font-size: clamp(42px, 13vw, 58px); }
   .login-tile--flow { padding: 18px; grid-template-columns: 1fr; gap: 6px; }
-  .login-tile--map { padding: 14px; }
-  .login-tile--map .city-scene { min-height: 232px; }
-  .login-map-caption { left: 24px; right: 24px; bottom: 24px; }
   .login-tile--flow > div { padding: 8px 0; grid-template-columns: 46px minmax(0, 1fr); }
   .login-tile--flow > div + div { border-left: 0; border-top: 1px solid rgb(23 36 58 / .2); }
   .flow-icon { width: 46px; height: 46px; border-radius: 14px; }
@@ -2223,7 +2129,7 @@ select:focus {
 
 
 /* Labels stay with their values when working registers collapse to a phone. */
-.bottom-nav a.bottom-nav__create { color: #fff; background: var(--violet); }
+.bottom-nav a.bottom-nav__create { width: calc(100% - 12px); max-width: 64px; min-height: 44px; height: 48px; place-self: center; color: #fff; background: var(--violet); }
 .bottom-nav a.bottom-nav__create:active { background: var(--violet-deep); }
 .topbar__user .avatar { color: var(--text); }
 .notification-list p, .notification-list small { color: #596375; }

@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 
-test('login composition fits desktop and remains safe on mobile', async ({ page }) => {
-  const reviewDirectory = path.resolve('.impeccable/review');
+test('login composition fits desktop and remains safe on mobile', async ({ page }, testInfo) => {
+  const reviewDirectory = testInfo.outputPath('review');
   mkdirSync(reviewDirectory, { recursive: true });
 
   for (const viewport of [{ width: 1280, height: 720 }, { width: 1904, height: 913 }]) {

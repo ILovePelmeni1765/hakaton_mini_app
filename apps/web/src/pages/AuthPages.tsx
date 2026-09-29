@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
-import { ArrowRight, CheckCircle2, Eye, EyeOff, MapPinned, Route, ShieldCheck, UsersRound } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Eye, EyeOff, MapPinned, ShieldCheck, UsersRound } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button, Card } from '@pulse/ui';
 import { api } from '../api';
@@ -50,21 +50,6 @@ export function LoginPage() {
           <h1>Ваш сигнал запускает изменения</h1>
           <p>Отметьте проблему на карте — мы покажем, кто отвечает и как меняется её статус.</p>
           <button className="login-signal__action" type="button" onClick={() => document.getElementById('login-card')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' })}>От сигнала к результату <ArrowRight size={20} /></button>
-        </article>
-
-        <article className="login-tile login-tile--map" aria-label="Обращение на карте Новосибирска">
-          <div className="city-scene" aria-hidden="true">
-            <span className="city-scene__river" />
-            <span className="city-scene__road city-scene__road--one" />
-            <span className="city-scene__road city-scene__road--two" />
-            <span className="city-scene__park" />
-            <span className="city-scene__block city-scene__block--one" />
-            <span className="city-scene__block city-scene__block--two" />
-            <span className="city-scene__block city-scene__block--three" />
-            <span className="city-scene__pin"><MapPinned size={28} /></span>
-            <span className="city-scene__route"><Route size={24} /></span>
-          </div>
-          <div className="login-map-caption"><span>Новосибирск</span><strong>Сигнал уже на карте</strong></div>
         </article>
 
         <article className="login-tile login-tile--flow">

@@ -11,7 +11,6 @@ export async function api<T>(path: string, options: RequestInit & { json?: unkno
   try { response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
-  'ngrok-skip-browser-warning': 'true',
   ...(options.json ? { 'Content-Type': 'application/json' } : {}),
   ...(token ? { Authorization: `Bearer ${token}` } : {}),
   ...options.headers,

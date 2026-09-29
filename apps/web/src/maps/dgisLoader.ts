@@ -1,3 +1,4 @@
+import { Clusterer } from '@2gis/mapgl-clusterer';
 export interface DgisEvented {
   on(type: string, listener: (event: DgisEvent) => void): this;
   off(type: string, listener: (event: DgisEvent) => void): this;
@@ -59,7 +60,6 @@ declare global {
 }
 
 const MAPGL_SCRIPT = 'https://mapgl.2gis.com/api/js/v1';
-const CLUSTERER_SCRIPT = 'https://unpkg.com/@2gis/mapgl-clusterer@2.5.2/dist/clustering.js';
 let loading: Promise<DgisMapApi> | undefined;
 
 function loadScript(src: string, marker: string) {
@@ -83,14 +83,22 @@ function loadScript(src: string, marker: string) {
 }
 
 export function load2GisMaps() {
-  if (window.mapgl?.Clusterer) return Promise.resolve(window.mapgl);
+  if (window.mapgl) {
+    window.mapgl.Clusterer = Clusterer as unknown as ClustererConstructor;
+    return Promise.resolve(window.mapgl);
+  }
+
   if (loading) return loading;
 
   loading = (async () => {
-    if (!window.mapgl) await loadScript(MAPGL_SCRIPT, '2gis-mapgl');
-    if (!window.mapgl) throw new Error('MapGL загрузился без объекта mapgl');
-    if (!window.mapgl.Clusterer) await loadScript(CLUSTERER_SCRIPT, '2gis-clusterer');
-    if (!window.mapgl.Clusterer) throw new Error('Модуль кластеризации 2ГИС не загрузился');
+    await loadScript(MAPGL_SCRIPT, '2gis-mapgl');
+
+    if (!window.mapgl) {
+      throw new Error('MapGL загрузился без объекта mapgl');
+    }
+
+    window.mapgl.Clusterer = Clusterer as unknown as ClustererConstructor;
+
     return window.mapgl;
   })().catch((error: unknown) => {
     loading = undefined;

@@ -5,7 +5,7 @@ import path from 'node:path';
 test('capture administrative result registers for finish review', async ({ page }, testInfo) => {
   test.setTimeout(120_000);
   const device = testInfo.project.name.startsWith('mobile') ? 'mobile' : 'desktop';
-  const directory = path.resolve('.impeccable/review/coverage');
+  const directory = testInfo.outputPath('review', 'coverage');
   mkdirSync(directory, { recursive: true });
 
   await page.goto('/login', { waitUntil: 'domcontentloaded' });
